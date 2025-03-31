@@ -1,0 +1,147 @@
+1. Biuro projektów architektonicznych
+
+│
+├── 1.1 Rodzaje projektów
+│ ├── 1.1.1 Budynki mieszkalne
+│ │ ├── Domy jednorodzinne
+│ │ ├── Domy wielorodzinne
+│ │ ├── Apartamentowce
+│ │ ├── Osiedla mieszkaniow:
+│ │ ├── Budynki ekologiczne i pasywne
+│ │
+│ ├── 1.1.2 Budynki komercyjne
+│ │ ├── Biura i centra biznesowe
+│ │ ├── Hotele i pensjonaty
+│ │ ├── Centra handlowe
+│ │ ├── Restauracje i kawiarnie
+│ │ ├── Hale przemysłowe i magazyny
+│ │
+│ ├── 1.1.3 Budynki użyteczności publicznej
+│ │ ├── Szkoły i uczelnie
+│ │ ├── Szpitale i przychodnie
+│ │ ├── Obiekty sportowe
+│ │ ├── Budynki rządowe i urzędy
+│ │ ├── Biblioteki i muzea
+│ │
+│ ├── 1.1.4 Projekty wnętrz
+│ │ ├── Wnętrza mieszkalne
+│ │ ├── Wnętrza komercyjne
+│ │ ├── Adaptacja wnętrz historycznych
+│ │ ├── Ergonomia i funkcjonalność
+│ │
+│ ├── 1.1.5 Projekty urbanistyczne
+│ │ ├── Planowanie przestrzenne
+│ │ ├── Projekty zagospodarowania terenów
+│ │ ├── Inteligentne miasta
+│ │
+│ ├── 1.1.6 Rewitalizacja i renowacja
+│ ├── Ochrona zabytków
+│ ├── Modernizacja budynków
+│ ├── Adaptacja budynków poprzemysłowych
+│ ├── Wzmocnienia konstrukcyjne
+1.2 Zespół i role
+
+│
+├── 1.2.1 Architekt
+│ ├── Projektowanie koncepcyjne
+│ ├── Nadzór nad realizacją
+│ ├── Kontakt z klientem
+│
+├── 1.2.2 Inżynier budowlany
+│ ├── Projektowanie konstrukcji
+│ ├── Dobór materiałów
+│ ├── Analiza obciążeń
+│
+├── 1.2.3 Konstruktor
+│ ├── Obliczenia wytrzymałościowe
+│ ├── Stropy, fundamenty, ściany nośne
+│
+├── 1.2.4 Projektant wnętrz
+│ ├── Ergonomia przestrzeni
+│ ├── Dobór materiałów i kolorystyki
+│ ├── Stylizacja wnętrz
+│
+├── 1.2.5 Urbanista
+│ ├── Planowanie przestrzenne
+│ ├── Analiza infrastruktury
+│ ├── Integracja z przestrzenią miejską
+│
+├── 1.2.6 Kosztorysant
+│ ├── Wycena kosztów budowy
+│ ├── Analiza kosztów materiałów
+│ ├── Przygotowanie budżetu
+│
+├── 1.2.7 Menedżer projektu
+│ ├── Harmonogramy
+│ ├── Koordynacja zespołu
+│ ├── Zarządzanie ryzykiem
+1.3 Etapy realizacji projektu
+
+│
+├── 1.3.1 Koncepcja
+│ ├── Spotkanie z klientem
+│ ├── Analiza potrzeb
+│ ├── Wstępne szkice
+│
+├── 1.3.2 Projekt wstępny
+│ ├── Układ funkcjonalny
+│ ├── Wybór materiałów
+│ ├── Wstępne wizualizacje
+│
+├── 1.3.3 Projekt budowlany
+│ ├── Dokumentacja techniczna
+│ ├── Uzgodnienia z urzędami
+│
+├── 1.3.4 Projekt wykonawczy
+│ ├── Szczegóły konstrukcyjne
+│ ├── Specyfikacje techniczne
+│
+├── 1.3.5 Nadzór autorski
+│ ├── Wizyty na budowie
+│ ├── Zmiany projektowe
+│
+├── 1.3.6 Odbiór inwestycji
+│ ├── Sprawdzenie zgodności projektu
+│ ├── Dokumentacja powykonawcza
+1.4 Technologie i narzędzia
+
+│
+├── 1.4.1 CAD
+│ ├── AutoCAD
+│ ├── ArchiCAD
+│
+├── 1.4.2 BIM
+│ ├── Revit
+│ ├── Allplan
+│
+├── 1.4.3 Modelowanie 3D
+│ ├── SketchUp
+│ ├── 3ds Max
+│
+├── 1.4.4 Wizualizacje
+│ ├── Lumion
+│ ├── V-Ray
+│
+├── 1.4.5 Zarządzanie projektami
+│ ├── Asana
+│ ├── Trello
+1.5 Aspekty prawne i administracyjne
+
+│
+├── 1.5.1 Pozwolenie na budowę
+├── 1.5.2 Normy budowlane
+├── 1.5.3 Przepisy dotyczące ochrony środowiska
+├── 1.5.4 Współpraca z urzędami i klientami
+1.6 Finansowanie i budżetowanie
+
+│
+├── 1.6.1 Kosztorysy
+├── 1.6.2 Źródła finansowania inwestycji
+├── 1.6.3 Dotacje i fundusze UE
+1.7 Współpraca z innymi branżami
+
+│
+├── 1.7.1 Firmy budowlane
+├── 1.7.2 Dekoratorzy wnętrz
+├── 1.7.3 Instalatorzy (elektryka, hydraulika)
+├── 1.7.4 Inspektorzy nadzoru
