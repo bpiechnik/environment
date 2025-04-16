@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+# Check if tmux is installed
+if ! command -v tmux &> /dev/null; then
+    echo "Error: tmux is not installed. Please install it (e.g., 'brew install tmux')."
+    exit 1
+fi
+
+# Check if fzf is installed
+if ! command -v fzf &> /dev/null; then
+    echo "Error: fzf is not installed. Please install it (e.g., 'brew install fzf')."
+    exit 1
+fi
+
+sessions=$(tmux ls 2>/dev/null | awk -F':' '{print $1}')
+
+if [ -z "$sessions" ]; then
+    echo "No tmux sessions are currently running."
+    exit 0
+fi
+
+selected_sessions=$(echo "$sessions" | fzf -m --height 40% --border --prompt="Select tmux sessions to kill (use TAB to multi-select): " --header="Press CTRL+C to cancel" --cycle)
+
+# Check if the user cancelled fzf (e.g., pressed CTRL+C or ESC)
+if [ -z "$selected_sessions" ]; then
+    echo "No sessions selected. Exiting."
+    exit 0
+fi
+
+# --- Kill Selected Sessions ---
+
+echo "The following tmux sessions will be killed:"
+echo "$selected_sessions"
+echo # Add a newline for better readability
+
+# Ask for confirmation before killing
+read -p "Are you sure? (y/N): " confirm
+confirm=${confirm:-N} # Default to No if user just presses Enter
+
+if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+    echo "Aborted."
+    exit 0
+fi
+
+# Loop through each selected session name and kill it
+echo "$selected_sessions" | while IFS= read -r session_name; do
+    if [ -n "$session_name" ]; then # Ensure the line is not empty
+        echo "Killing tmux session: $session_name"
+        tmux kill-session -t "$session_name"
+        if [ $? -eq 0 ]; then
+            echo "Session '$session_name' killed successfully."
+        else
+            echo "Error killing session '$session_name'. It might have already been closed."
+        fi
+    fi
+done
+
+echo "Finished."
+exit 0

@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+session_list_output=$(tmux list-sessions -F "#{session_name}: #{session_windows} windows#{?session_attached, (attached),}" 2>/dev/null)
+exit_status=$?
+
+if [[ $exit_status -ne 0 || -z "$session_list_output" ]]; then
+    if ! pgrep -x tmux > /dev/null; then
+        echo "Error: No tmux server is running." >&2
+        exit 1
+    else
+         if [[ -z "$session_list_output" ]]; then
+             echo "No active tmux sessions found."
+             exit 0
+         else
+             echo "Error listing tmux sessions (Exit code: $exit_status)." >&2
+             exit 1
+         fi
+    fi
+fi
+
+selected_line=$(echo "$session_list_output" | fzf \
+    --header "Select Tmux Session" \
+    --height=${FZF_HEIGHT:-"40%"} \
+    --layout=reverse \
+    --border \
+    --prompt="Switch to: " \
+    --cycle)
+
+if [[ -z "$selected_line" ]]; then
+    exit 0
+fi
+
+selected_session_name=$(echo "$selected_line" | cut -d ':' -f 1)
+
+if [[ -z "$selected_session_name" ]]; then
+    echo "Error: Could not parse session name from selection." >&2
+    exit 1
+fi
+
+if [[ -n "$TMUX" ]]; then
+    current_session_name=$(tmux display-message -p '#S')
+    if [[ "$selected_session_name" == "$current_session_name" ]]; then
+        echo "Already attached to session '$selected_session_name'."
+        exit 0
+    fi
+
+    echo "Switching to session '$selected_session_name'..."
+    tmux switch-client -t "$selected_session_name"
+else
+    echo "Attaching to session '$selected_session_name'..."
+    tmux attach-session -t "$selected_session_name"
+fi
+
+exit 0

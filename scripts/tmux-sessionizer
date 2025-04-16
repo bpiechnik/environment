@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+MONOREPO_PATH="${HOME}/repos/code"
+GO_SERVICES_BASE_PATH="${MONOREPO_PATH}/go/services"
+
+OTHER_PROJECT_PATHS_EXPANDED=("${HOME}/repos")
+
+selected_line=$(
+    {
+        find "${OTHER_PROJECT_PATHS_EXPANDED[@]}" -mindepth 1 -maxdepth 1 -type d -print 2>/dev/null | \
+            awk -F/ '{print $NF "\t" $0}'
+
+        find "$GO_SERVICES_BASE_PATH" -mindepth 1 -maxdepth 2 -name 'BUILD.bazel' -type f -print 2>/dev/null | \
+            sed 's|/[^/]*$||' | \
+            awk -F/ '{print $NF "\t" $0}'
+
+    } | awk '!NF || !seen[$0]++' | fzf --delimiter='\t' --with-nth=1 --height=${FZF_HEIGHT:-'40%'} --layout=reverse --border --prompt="Select Project: " --header="Projects / Services"
+)
+
+if [[ -z "$selected_line" ]]; then
+    echo "No project selected."
+    exit 0
+fi
+selected=$(echo "$selected_line" | awk -F'\t' '{print $2}')
+
+if [[ -z "$selected" ]]; then
+    echo "Failed to extract path."
+    exit 1
+fi
+
+selected_name=$(basename "$selected" | tr . _)
+tmux_running=$(pgrep tmux)
+
+if [[ -z $TMUX ]] && ! pgrep -x tmux > /dev/null; then
+    echo "Starting new tmux server and session '$selected_name' in '$selected'..."
+    tmux new-session -s "$selected_name" -c "$selected"
+    exit 0
+fi
+
+if ! tmux has-session -t="$selected_name" 2> /dev/null; then
+    echo "Creating new detached tmux session '$selected_name' in '$selected'..."
+    tmux new-session -ds "$selected_name" -c "$selected"
+fi
+
+if [[ -z $TMUX ]]; then
+    echo "Attaching to tmux session '$selected_name'..."
+    tmux attach-session -t "$selected_name"
+else
+    echo "Switching to tmux session '$selected_name'..."
+    tmux switch-client -t "$selected_name"
+fi
