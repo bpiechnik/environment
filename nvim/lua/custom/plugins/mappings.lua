@@ -1,6 +1,6 @@
 return {
-  vim.keymap.set('n', '<leader>rnu', '<cmd>set rnu!<CR>', { desc = 'Toggle relative number' }),
-  vim.keymap.set('n', '<leader>n', '<cmd>set nu!<CR>', { desc = 'Toggle line number' }),
+  vim.keymap.set('n', '<leader>nu', '<cmd>set rnu!<CR>', { desc = 'Toggle relative number' }),
+  vim.keymap.set('n', '<leader>nn', '<cmd>set nu!<CR>', { desc = 'Toggle line number' }),
   vim.keymap.set('n', '<leader>vs', '<cmd>:vs<CR>', { desc = 'Vertical pane split' }),
   vim.keymap.set('n', '<leader>sp', '<cmd>:sp<CR>', { desc = 'Horizontal pane split' }),
   vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv"),
