@@ -1,0 +1,128 @@
+[[language]]
+name = "ruby"
+language-servers = ["ruby-lsp"]
+auto-format = true
+
+[language-server.ruby-lsp]
+command = "ruby-lsp"
+config = { diagnostics = true, formatting = true }
+
+[[language]]
+name = "go"
+roots = ["go.mod", "go.work"]
+auto-format = false
+language-servers = ["gopls"]
+formatter = { command = "/opt/homebrew/bin/golangci-lint", args = [
+  "fmt",
+  "--stdin",
+  "-c",
+  "/Users/bartosz.piechnik@opendoor.com/.config/.golangci-lint.yaml",
+] }
+# formatter = ["gofumpt"]
+
+[language-server.gopls.config]
+gofumpt = true
+semanticTokens = true
+verboseOutput = true
+usePlaceholders = true
+directoryFilters = ["-vendor", "-gen", "-third_party"]
+
+[language-server.gopls.config.analyses]
+unusedparams = true
+nilness = true
+unusedwrite = true
+unreachable = true
+shadow = true
+nonewvars = true
+
+[[language]]
+name = "json"
+auto-format = true
+file-types = ["json"]
+formatter = { command = "yq", args = ["e", "-"] }
+
+[[language]]
+name = "yaml"
+auto-format = false
+file-types = ["yaml", "yml"]
+formatter = { command = "yq", args = ["e", "-"] }
+
+[[language]]
+name = "docker-compose"
+file-types = [
+  "docker-compose.yml",
+  "docker-compose.yaml",
+  "podman-compose.yml",
+  "podman-compose.yaml",
+]
+
+[[language]]
+name = "lua"
+auto-format = true
+formatter = { command = "stylua", args = ["-"] }
+
+[[language]]
+name = "python"
+
+[language-server.pylsp.config.pylsp.plugins]
+pycodestyle = { maxLineLength = 110 }
+black = { enabled = true }
+rope_autoimport = { enabled = true }
+rope_completion = { enabled = true }
+autopep8 = { enabled = false }
+flake8 = { enabled = true }
+
+[[language]]
+name = "sql"
+file-types = ["sql"]
+language-servers = ["postgrestools"]
+formatter = { command = "pg_format", args = ["-"] }
+
+[language-server.postgrestools]
+command = "postgrestools"
+args = ["lsp-proxy"]
+
+[[language]]
+name = "protobuf"
+language-servers = ["bufls"]
+formatter = { command = "buf", args = ["format", "simple"] }
+
+[language-server.bufls]
+command = "buf"
+args = ["beta", "lsp"]
+
+[[language]]
+name = "markdown"
+formatter = { command = "prettier", args = ["--parser", "markdown"] }
+
+[[language]]
+name = "html"
+scope = "source.html"
+roots = []
+file-types = ["html"]
+language-servers = ["superhtml-lsp"]
+
+[language-server.superhtml-lsp]
+command = "superhtml"
+args = ["lsp"]
+
+[[language]]
+name = "toml"
+formatter = { command = "taplo", args = ["fmt", "-"] }
+
+[[language]]
+name = "javascript"
+formatter = { command = "prettier", args = ["--parser", "typescript"] }
+
+[[language]]
+name = "typescript"
+formatter = { command = "prettier", args = ["--parser", "typescript"] }
+
+[[language]]
+name = "tsx"
+formatter = { command = "prettier", args = ["--parser", "typescript"] }
+
+[[language]]
+name = "graphql"
+file-types = ["graphql", "typescriptreact", "javascriptreact"]
+formatter = { command = "prettier", args = ["--parser", "graphql"] }

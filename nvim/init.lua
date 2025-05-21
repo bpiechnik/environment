@@ -41,6 +41,9 @@ vim.opt.timeoutlen = 300
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 
+-- Sets how neovim will display certain whitespace characters in the editor.
+--  See `:help 'list'`
+--  and `:help 'listchars'`
 vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
@@ -137,7 +140,7 @@ require('lazy').setup({
     },
   },
 
-  { -- Useful plugin to show you pending keybinds.
+  {                     -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     opts = {
@@ -183,14 +186,14 @@ require('lazy').setup({
 
       -- Document existing key chains
       spec = {
-        { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
+        { '<leader>c', group = '[C]ode',     mode = { 'n', 'x' } },
         { '<leader>d', group = '[D]ocument' },
         { '<leader>r', group = '[R]ename' },
         { '<leader>s', group = '[S]earch' },
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
-        { '<leader>g', group = '[G]olang', mode = { 'n' } },
+        { '<leader>g', group = '[G]olang',   mode = { 'n' } },
       },
     },
   },
@@ -215,7 +218,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons',            enabled = vim.g.have_nerd_font },
     },
     config = function()
       require('telescope').setup {
@@ -292,7 +295,7 @@ require('lazy').setup({
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
-      { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim',       opts = {} },
 
       -- Allows extra capabilities provided by nvim-cmp
       'hrsh7th/cmp-nvim-lsp',
@@ -363,8 +366,19 @@ require('lazy').setup({
 
       local servers = {
         gopls = {
-          cmd_env = { GOFLAGS = '-tags=wireinject' },
+          directoryFilters = { '-vendor', '-gen', '-third_party' },
+          experimentalWorkspaceModule = true,
           cmd = { 'gopls' },
+          settings = {
+            analyses = {
+              unusedparams = true,
+              nilness = true,
+              unusedwrite = true,
+              shadow = true,
+            },
+            staticcheck = true,
+            usePlaceholders = true,
+          },
           filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
           root_dir = function(fname)
             local util = require 'lspconfig.util'
@@ -557,6 +571,9 @@ require('lazy').setup({
       highlight = {
         enable = true,
         additional_vim_regex_highlighting = { 'ruby' },
+        disable = function(lang, bufnr) -- Disable in files with more than 5K
+          return vim.api.nvim_buf_line_count(bufnr) > 5000
+        end,
       },
       indent = { enable = true, disable = { 'ruby' } },
     },

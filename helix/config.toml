@@ -1,0 +1,40 @@
+theme = "catppuccin_mocha"
+[keys.normal]
+"}" = "goto_next_paragraph"
+"{" = "goto_prev_paragraph"
+C-h = "jump_view_left"
+C-l = "jump_view_right"
+C-j = "jump_view_down"
+C-k = "jump_view_up"
+S-v = ["extend_to_line_bounds", "select_mode"]
+
+[keys.normal.space]
+f = "file_picker_in_current_directory"
+F = "file_picker"
+o = { o = ":sh tmux new-window -n fx '~/.config/helix/yazi-picker.sh open'", v = ":sh tmux new-window -n fx '~/.config/helix/yazi-picker.sh vsplit'", h = ":sh tmux new-window -n fx '~/.config/helix/yazi-picker.sh hsplit'" }
+
+[keys.select]
+"}" = "goto_next_paragraph"
+"{" = "goto_prev_paragraph"
+
+[editor]
+end-of-line-diagnostics = "hint"
+
+[editor.lsp]
+display-messages = true
+display-inlay-hints = true
+
+[editor.inline-diagnostics]
+cursor-line = "error"
+other-lines = "disable"
+prefix-len = 5
+
+[editor.cursor-shape]
+insert = "bar"
+
+[editor.file-picker]
+hidden = true
+
+[editor.auto-save]
+after-delay.enable = true
+after-delay.timeout = 2000
