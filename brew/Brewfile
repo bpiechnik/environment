@@ -59,11 +59,18 @@ brew "buf"
 brew "grpcurl"
 brew "sqlc"
 
+# --- kubernetes ---
+# kube-ps1 above renders the context in the prompt; k/kctx aliases need these
+brew "kubernetes-cli"       # kubectl
+brew "kubectx"              # kubectx + kubens
+
 # --- containers / data ---
 brew "colima"
 brew "podman"
 brew "docker"
 brew "docker-compose"
+brew "podman-compose"       # pcd / pcdv aliases
+brew "awscli-local"         # awslocal: slist / qurl / deleteq aliases
 brew "postgresql@18"
 brew "valkey"
 
