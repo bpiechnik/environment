@@ -1,0 +1,4 @@
+*ZTBD/data*
+*.mypy*
+*.ropeproject*
+**entgen**

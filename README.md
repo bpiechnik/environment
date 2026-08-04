@@ -19,6 +19,7 @@ place, so editing either the repo or the live path edits the same file and
 | `zsh/aliases.zsh` | `~/.config/zsh/aliases.zsh` |
 | `tmux/tmux.conf` | `~/.config/tmux/tmux.conf` |
 | `nvim/` | `~/.config/nvim` |
+| `helix/*` | `~/.config/helix/` |
 | `ghostty/config` | `~/.config/ghostty/config` |
 | `go/golangci-lint.yaml` | `~/.config/.golangci-lint.yaml` |
 | `scripts/tmux-*` | `~/.local/scripts/` |
@@ -52,3 +53,7 @@ tmux prefix is `Ctrl-Space`.
 - nvim LSPs → mason (`lua_ls`, `pyright`, `ts_ls`). gopls and golangci-lint
   come from Homebrew instead, pinned to `/opt/homebrew/bin` so editor tooling
   stays off the asdf shim.
+- helix LSPs → Homebrew (no mason equivalent), see `brew/Brewfile`. `hx --health
+  <lang>` flags helix's unused default candidates (ty/ruff/jedi for python,
+  tombi for toml) as missing; the configured server resolves fine.
+- `$EDITOR` is nvim; helix is kept configured and installed alongside it.

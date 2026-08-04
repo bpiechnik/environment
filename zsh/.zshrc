@@ -1,7 +1,8 @@
 export ZSH="$HOME/.oh-my-zsh"
 
 export GOPATH="/opt/homebrew/Cellar/go"
-path=("$GOPATH/bin" "$HOME/.cargo/bin" $path)
+# .local/scripts holds the helper scripts helix/tmux configs invoke by name
+path=("$GOPATH/bin" "$HOME/.cargo/bin" "$HOME/.local/bin" "$HOME/.local/scripts" $path)
 
 ZSH_THEME="robbyrussell"
 

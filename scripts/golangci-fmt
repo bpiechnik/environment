@@ -1,0 +1,4 @@
+#!/bin/sh
+# Formatter shim: helix passes formatter args verbatim (no shell, no ~ or $HOME
+# expansion), so the config file path cannot be written inline.
+exec /opt/homebrew/bin/golangci-lint fmt --stdin -c "$HOME/.config/.golangci-lint.yaml"

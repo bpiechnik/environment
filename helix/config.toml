@@ -1,0 +1,52 @@
+theme = "catppuccin_mocha"
+
+[keys.normal]
+"}" = "goto_next_paragraph"
+"{" = "goto_prev_paragraph"
+C-h = "jump_view_left"
+C-l = "jump_view_right"
+C-j = "jump_view_down"
+C-k = "jump_view_up"
+S-v = ["extend_to_line_bounds", "select_mode"]
+
+[keys.normal.space]
+f = "file_picker_in_current_directory"
+F = "file_picker"
+o = { o = ":pipe-to tmux split-window -h '~/.config/helix/yazi-picker.sh open'", v = ":pipe-to tmux split-window -h '~/.config/helix/yazi-picker.sh vsplit'", h = ":pipe-to tmux split-window -v '~/.config/helix/yazi-picker.sh hsplit'" }
+B = ":pipe-to tmux display-popup -w 65%% -h 65%% '~/.local/scripts/helix-git-blame %sh{pwd} %{buffer_name} %{cursor_line}'"
+M = ":pipe-to tmux display-popup -w 80%% -h 80%% '~/.local/scripts/markdown-reader %sh{pwd} %{buffer_name}'"
+
+[keys.normal.space.g]
+h = ':run-shell-command ~/.local/scripts/git-hunk %{buffer_name} %{cursor_line} 3'
+# inline blame
+b = ":run-shell-command ~/.local/scripts/blame_line_pretty %{buffer_name} %{cursor_line}"
+# full last commit in the line changes for the file
+B = ':open %sh{~/.local/scripts/blame_file_pretty %{buffer_name} %{cursor_line}}'
+
+[keys.select]
+"}" = "goto_next_paragraph"
+# "{" = "goto_prev_paragraph"
+
+[editor]
+end-of-line-diagnostics = "hint"
+line-number = "relative"
+
+[editor.lsp]
+display-messages = true
+display-inlay-hints = true
+
+[editor.inline-diagnostics]
+cursor-line = "error"
+other-lines = "disable"
+prefix-len = 5
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+
+[editor.file-picker]
+hidden = true
+
+[editor.auto-save]
+after-delay.enable = true
+after-delay.timeout = 2000

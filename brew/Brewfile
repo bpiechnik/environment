@@ -31,8 +31,25 @@ brew "wget"
 brew "lazygit"
 brew "gh"
 
-# --- editor ---
+# --- editors ---
 brew "neovim"
+brew "helix"
+brew "yazi"                 # helix space-o file picker
+brew "glow"                 # helix space-M markdown reader
+
+# --- language servers ---
+# nvim gets these via mason; helix has no equivalent, so they come from brew.
+brew "lua-language-server"
+brew "postgres-language-server"  # provides postgrestools, helix's sql LS
+brew "typescript-language-server"
+brew "yaml-language-server"
+brew "bash-language-server"
+brew "vscode-langservers-extracted"
+brew "python-lsp-server"
+brew "ruby-lsp"
+brew "marksman"
+brew "superhtml"
+brew "golangci-lint-langserver"
 
 # --- go ---
 # nvim pins gopls/golangci-lint to /opt/homebrew/bin and puts

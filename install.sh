@@ -71,11 +71,18 @@ link "$REPO/nvim"                "$CONFIG/nvim"
 link "$REPO/ghostty/config"      "$CONFIG/ghostty/config"
 link "$REPO/go/golangci-lint.yaml" "$CONFIG/.golangci-lint.yaml"
 
-for s in tmux-sessionizer tmux-switch-session tmux-sessionizer-clean; do
+for f in config.toml languages.toml yazi-picker.sh ignore python-venv-lsp.sh; do
+  link "$REPO/helix/$f" "$CONFIG/helix/$f"
+done
+
+for s in tmux-sessionizer tmux-switch-session tmux-sessionizer-clean \
+         golangci-fmt blame_file_pretty blame_line_pretty git-hunk \
+         helix-git-blame markdown-reader; do
   link "$REPO/scripts/$s" "$HOME/.local/scripts/$s"
 done
 
-chmod +x "$REPO"/scripts/* "$REPO/nvim/gopls-wrapper.sh"
+chmod +x "$REPO"/scripts/* "$REPO/nvim/gopls-wrapper.sh" \
+         "$REPO/helix/yazi-picker.sh" "$REPO/helix/python-venv-lsp.sh"
 
 # --- ~/.zshrc stub ---
 # A real file, not a symlink: installers (conda init, rustup, envman, work

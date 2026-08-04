@@ -5,6 +5,10 @@
 !nvim/
 !nvim/**
 
+# scratch files land in ~/.config/helix while editing; some have held real
+# work data (a 137KB inspection dump). Only the real config is tracked.
+helix/*.json
+
 # machine-local / work-specific — never committed
 .zshrc.local
 *.local

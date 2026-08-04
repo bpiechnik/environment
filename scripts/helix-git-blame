@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+CATPPUCCIN_GREEN='#a6da95'
+CATPPUCCIN_MAUVE='#c6a0f6'
+
+HELIX_PWD="$1"
+FILE="$2"; LINE="$3"
+if [ -z "$LINE" ]; then
+  LINE=1
+fi
+
+FILEPATH="${HELIX_PWD}/${FILE}"
+# Run git blame and fzf commands
+# Left side: line number, date, author (no code)
+# Right side (preview): syntax-highlighted code with bat
+git blame "$FILEPATH" --line-porcelain |
+  awk '
+    /^[0-9a-f]{40}/ { hash=$1; next }
+    /^author / { author=substr($0, 8); next }
+    /^author-time / {
+      timestamp=$2
+      cmd = "date -r " timestamp " +\"%Y-%m-%d %H:%M\""
+      cmd | getline date
+      close(cmd)
+      next
+    }
+    /^\t/ {
+      line_num++
+      printf "%4d | %s | %-20s\n", line_num, date, author
+    }
+  ' |
+  fzf --ansi \
+      --border \
+      --height '100%' \
+      --color "hl+:$CATPPUCCIN_GREEN:reverse,hl:$CATPPUCCIN_MAUVE:reverse" \
+      --multi \
+      --print-query --exit-0 \
+      --scrollbar '▍' \
+      --no-sort \
+      --tac \
+      --cycle \
+      --preview "bat --theme 'Catppuccin Mocha' --color=always --style=numbers --highlight-line={1} '$FILEPATH'" \
+      --preview-window=right:60%:wrap:+{1}-/2
