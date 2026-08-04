@@ -1,5 +1,12 @@
-theme=catppuccin-mocha
+theme=Catppuccin Mocha
 fullscreen=true
-font-size=12
+font-size=13
 window-theme=auto
 window-inherit-font-size=false
+macos-option-as-alt = left
+bell-features=audio
+keybind = alt+left=unbind
+keybind = alt+right=unbind
+keybind = shift+enter=text:\x1b\r
+custom-shader = shaders/cursor_tail.glsl
+custom-shader-animation = always

@@ -1,0 +1,12 @@
+# Copy to ~/.config/tmux-sessionizer/roots.conf and edit.
+# This example file is tracked; roots.conf itself is gitignored.
+
+DIR_ROOTS=(
+  "$HOME/repos"
+  # "$HOME/work/somerepo/services"
+)
+
+MARKER_ROOTS=(
+  # "$HOME/work/somerepo/packages:package.json"
+  # "$HOME/work/somerepo/libs:go.mod"
+)

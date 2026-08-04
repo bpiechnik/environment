@@ -1,0 +1,59 @@
+version: "2"
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+    - golines
+  settings:
+    golines:
+      max-len: 200
+      tab-len: 4
+      shorten-coments: true
+      reformat-tags: false
+    gofumpt:
+      extra-rules: true
+linters:
+  default: fast
+  enable:
+    - bodyclose
+    - contextcheck
+    - depguard
+    - dogsled
+    - dupl
+    - errcheck
+    - errname
+    - exhaustive
+    - copyloopvar
+    - funlen
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - gocyclo
+    - gosec
+    - govet
+    - ineffassign
+    - makezero
+    - misspell
+    - nakedret
+    - nilnil
+    - nilerr
+    - paralleltest
+    - prealloc
+    - reassign
+    - staticcheck
+    - unconvert
+    - unparam
+    - unused
+  exclusions:
+    generated: true
+    rules:
+      - path: .*_test.go
+        linters:
+          - funlen
+          - gosec
+          - dupl
+      - path: .*/repository/.*
+        linters:
+          - dupl
+    paths:
+      - \\sql.go$

@@ -1,19 +1,30 @@
 #!/usr/bin/env bash
 
-MONOREPO_PATH="${HOME}/repos/code"
-GO_SERVICES_BASE_PATH="${MONOREPO_PATH}/go/services"
+# Search roots come from an untracked local config so machine- and
+# work-specific layouts stay out of git. See roots.conf.example.
+#
+#   DIR_ROOTS     -- list immediate subdirectories of each path
+#   MARKER_ROOTS  -- "path:marker" pairs; lists dirs containing <marker>
+#                    within 2 levels (e.g. a JS workspace: "$X:package.json")
 
-OTHER_PROJECT_PATHS_EXPANDED=("${HOME}/repos")
+DIR_ROOTS=("${HOME}/repos")
+MARKER_ROOTS=()
+
+ROOTS_CONF="${XDG_CONFIG_HOME:-$HOME/.config}/tmux-sessionizer/roots.conf"
+[ -f "$ROOTS_CONF" ] && source "$ROOTS_CONF"
 
 selected_line=$(
     {
-        find "${OTHER_PROJECT_PATHS_EXPANDED[@]}" -mindepth 1 -maxdepth 1 -type d -print 2>/dev/null | \
-            awk -F/ '{print $NF "\t" $0}'
+        for root in "${DIR_ROOTS[@]}"; do
+            find "$root" -mindepth 1 -maxdepth 1 -type d -print 2>/dev/null | \
+                awk -F/ '{print $NF "\t" $0}'
+        done
 
-        find "$GO_SERVICES_BASE_PATH" -mindepth 1 -maxdepth 2 -name 'BUILD.bazel' -type f -print 2>/dev/null | \
-            sed 's|/[^/]*$||' | \
-            awk -F/ '{print $NF "\t" $0}'
-
+        for pair in "${MARKER_ROOTS[@]}"; do
+            find "${pair%%:*}" -mindepth 1 -maxdepth 2 -name "${pair##*:}" -type f -print 2>/dev/null | \
+                sed 's|/[^/]*$||' | \
+                awk -F/ '{print $NF "\t" $0}'
+        done
     } | awk '!NF || !seen[$0]++' | fzf --delimiter='\t' --with-nth=1 --height=${FZF_HEIGHT:-'40%'} --layout=reverse --border --prompt="Select Project: " --header="Projects / Services"
 )
 
@@ -29,7 +40,6 @@ if [[ -z "$selected" ]]; then
 fi
 
 selected_name=$(basename "$selected" | tr . _)
-tmux_running=$(pgrep tmux)
 
 if [[ -z $TMUX ]] && ! pgrep -x tmux > /dev/null; then
     echo "Starting new tmux server and session '$selected_name' in '$selected'..."

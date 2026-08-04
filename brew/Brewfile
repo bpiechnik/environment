@@ -1,41 +1,73 @@
-tap "bufbuild/buf"
-tap "homebrew/bundle"
-tap "isen-ng/dotnet-sdk-versions"
-tap "jakehilborn/jakehilborn"
-tap "localstack/tap"
-brew "argocd"
-brew "awscli"
-brew "displayplacer"
-brew "fd"
-brew "ffmpeg"
-brew "fzf"
-brew "gh"
-brew "ghostscript"
-brew "git"
-brew "go"
-brew "golang-migrate"
-brew "golangci-lint"
-brew "gopls"
-brew "netpbm"
-brew "librsvg"
-brew "graphviz"
-brew "grpcurl"
-brew "harper"
-brew "icdiff"
-brew "jq"
-brew "marksman"
-brew "neovim"
-brew "pre-commit"
-brew "prettier"
+# Essential dev tooling. Curated, not a `brew bundle dump` -- non-critical
+# extras (media, LaTeX, local-LLM, message queues, k8s/cloud CLIs) are
+# deliberately absent.
+#
+#   brew bundle install --file=brew/Brewfile
+#
+# NOT handled here:
+#   - language runtimes (go excepted, see below) -> asdf, see .tool-versions
+#   - nvim LSP servers                           -> mason installs lua_ls/pyright/ts_ls
+#   - nvim plugins                               -> lazy.nvim, see nvim/lazy-lock.json
+#   - oh-my-zsh + custom plugins, tpm            -> install.sh
+
+# --- shell / terminal ---
+brew "tmux"                 # tmux.conf + sessionizer scripts
+brew "kube-ps1"             # .zshrc prompt
+brew "direnv"               # .zshrc hook
+brew "thefuck"              # .zshrc alias
+brew "fzf"                  # fzf-tab plugin, sessionizer, `fzf --zsh`
+brew "zoxide"
+brew "coreutils"
+
+# --- core CLI ---
+brew "git"                  # newer than macOS /usr/bin/git
 brew "ripgrep"
-brew "rust"
-brew "telnet"
-brew "tmux"
-brew "tmux-sessionizer"
+brew "fd"
+brew "bat"                  # `df` alias
+brew "jq"                   # sqs aliases
+brew "yq"
 brew "tree"
-brew "vite"
 brew "wget"
-brew "yamlfmt"
-brew "bufbuild/buf/buf"
-cask "ghostty"
-cask "unnaturalscrollwheels"
+brew "lazygit"
+brew "gh"
+
+# --- editor ---
+brew "neovim"
+
+# --- go ---
+# nvim pins gopls/golangci-lint to /opt/homebrew/bin and puts
+# /opt/homebrew/opt/go/bin on gopls' PATH, keeping editor tooling off the
+# asdf shim. Homebrew go is required, not optional.
+brew "go"
+brew "gopls"
+brew "golangci-lint"        # v2 bundles gofumpt/goimports/golines as formatters
+brew "delve"
+
+# --- formatters used by conform.nvim ---
+brew "stylua"               # lua
+brew "prettier"             # js/ts/json/yaml/markdown
+brew "taplo"                # toml
+brew "pgformatter"          # sql (pg_format)
+brew "black"                # python
+brew "shellcheck"
+
+# --- python ---
+brew "uv"                   # good default to have around
+
+# --- rpc / codegen ---
+brew "buf"
+brew "grpcurl"
+brew "sqlc"
+
+# --- containers / data ---
+brew "colima"
+brew "podman"
+brew "docker"
+brew "docker-compose"
+brew "postgresql@18"
+brew "valkey"
+
+# --- casks ---
+cask "ghostty"                     # terminal, config in ghostty/
+cask "font-hack-nerd-font"         # ghostty font + nvim icons
+cask "font-symbols-only-nerd-font"

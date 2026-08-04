@@ -1,0 +1,14 @@
+.DS_Store
+
+# The global excludesfile (~/.config/.gitignore) has a bare `nvim` rule, which
+# would silently drop this repo's whole nvim config.
+!nvim/
+!nvim/**
+
+# machine-local / work-specific — never committed
+.zshrc.local
+*.local
+roots.conf
+.env
+*secret*
+*credential*
