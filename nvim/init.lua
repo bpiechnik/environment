@@ -23,7 +23,9 @@ vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
 vim.opt.smartindent = true
-vim.opt.wrap = false
+vim.opt.wrap = true
+vim.opt.linebreak = true
+vim.opt.breakindent = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.splitbelow = true
@@ -34,6 +36,10 @@ vim.opt.timeoutlen = 300
 vim.opt.undofile = true
 vim.opt.clipboard = "unnamedplus"
 vim.opt.scrolloff = 8
+-- Suppress the interactive "ATTENTION: swap file exists" prompt: plugins like
+-- fff.nvim open files via vim.cmd('edit ...') from Lua, which can't render
+-- that dialog and crashes with E5108 when another nvim session has the file open.
+vim.opt.shortmess:append("A")
 
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "go", "python", "typescript", "javascript", "json", "yaml", "lua", "markdown" },
@@ -45,14 +51,14 @@ vim.api.nvim_create_autocmd("FileType", {
 -- LSP keymaps (fires for every LSP client that attaches)
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(event)
-    local picker = require("lsp_picker")
+    local picker = require("snacks").picker
     local map = function(keys, func, desc)
       vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
     end
-    map("gd", picker.definitions, "Go to Definition")
-    map("grr", picker.references, "References")
-    map("gri", picker.implementations, "Implementations")
-    map("<leader>s", picker.document_symbols, "Document Symbols")
+    map("gd", function() picker.lsp_definitions() end, "Go to Definition")
+    map("grr", function() picker.lsp_references() end, "References")
+    map("gri", function() picker.lsp_implementations() end, "Implementations")
+    map("<leader>s", function() picker.lsp_symbols() end, "Document Symbols")
     map("<leader>k", vim.lsp.buf.hover, "Hover Documentation")
     map("<leader>rn", vim.lsp.buf.rename, "Rename")
     map("<leader>a", vim.lsp.buf.code_action, "Code Action")
@@ -85,31 +91,88 @@ vim.api.nvim_create_autocmd("VimEnter", {
   end,
 })
 
--- Prewarm gopls: open a hidden Go buffer to trigger indexing early
-vim.api.nvim_create_autocmd("VimEnter", {
-  callback = function()
-    vim.defer_fn(function()
-      local cwd = vim.uv.cwd()
-      if not cwd then return end
-      local go_mod = vim.fs.find("go.mod", { path = cwd, upward = true, type = "file" })[1]
-      if not go_mod then return end
-      -- Search from cwd, not the module root: a file from elsewhere in the
-      -- monorepo module would attach a second, unscoped gopls workspace
-      local go_file = vim.fs.find(function(name) return name:match("%.go$") end, { path = cwd, type = "file" })[1]
-      if not go_file then return end
-      local buf = vim.fn.bufadd(go_file)
-      vim.cmd(("noswapfile call bufload(%d)"):format(buf))
-      vim.bo[buf].buflisted = false
-    end, 200)
-  end,
-})
-
 vim.api.nvim_create_user_command("Fmt", function()
   require("conform").format({ async = true })
 end, { desc = "Format current buffer" })
 
+local function open_base_diff()
+  local cwd = vim.fn.getcwd()
+  local function get_git_output(args)
+    local command = { "git", "-C", cwd }
+    vim.list_extend(command, args)
+    local result = vim.system(command, { text = true }):wait(2000)
+    if result.code == 0 then
+      return vim.trim(result.stdout or "")
+    end
+    return ""
+  end
+
+  if get_git_output({ "rev-parse", "--show-toplevel" }) == "" then
+    vim.notify("Not in a Git repository", vim.log.levels.WARN)
+    return
+  end
+
+  local function prompt_base(pr_base)
+    local suggested = get_git_output({ "symbolic-ref", "--quiet", "--short", "refs/remotes/origin/HEAD" })
+    if pr_base and pr_base ~= "" then
+      local remote_ref = "origin/" .. pr_base
+      suggested = get_git_output({ "rev-parse", "--verify", "--end-of-options", remote_ref .. "^{commit}" }) ~= "" and remote_ref or pr_base
+    elseif suggested == "" then
+      for _, branch in ipairs({ "main", "master" }) do
+        if get_git_output({ "rev-parse", "--verify", "refs/heads/" .. branch }) ~= "" then
+          suggested = branch
+          break
+        end
+      end
+    end
+
+    -- Git stores ancestry, not the name of the branch a checkout was created from.
+    vim.ui.input({ prompt = "Review base branch: ", default = suggested }, function(base)
+      if not base or vim.trim(base) == "" then return end
+      local commit = get_git_output({ "rev-parse", "--verify", "--end-of-options", vim.trim(base) .. "^{commit}" })
+      if commit == "" then
+        vim.notify("Base branch not found locally; fetch it or choose another branch", vim.log.levels.WARN)
+        return
+      end
+      vim.cmd.DiffviewOpen(commit .. "...HEAD")
+    end)
+  end
+
+  if vim.fn.executable("gh") == 1 then
+    vim.system({ "gh", "pr", "view", "--json", "baseRefName", "--jq", ".baseRefName" }, {
+      cwd = cwd,
+      text = true,
+      timeout = 3000,
+    }, function(result)
+      vim.schedule(function()
+        prompt_base(result.code == 0 and vim.trim(result.stdout or "") or nil)
+      end)
+    end)
+  else
+    prompt_base()
+  end
+end
+
 -- Plugins
 require("lazy").setup({
+  {
+    "folke/snacks.nvim",
+    lazy = false,
+    priority = 1000,
+    keys = {
+      { "<leader>fe", function() require("snacks").explorer() end, desc = "File Explorer" },
+    },
+    opts = {
+      explorer = { enabled = true },
+      picker = {
+        enabled = true,
+        sources = {
+          lsp_symbols = { filter = { default = true } },
+        },
+      },
+    },
+  },
+
   -- Colorscheme
   {
     "catppuccin/nvim",
@@ -165,17 +228,7 @@ require("lazy").setup({
     config = function()
       require("mason").setup()
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
-      -- Disable file-watcher capability — gopls falls back to its own efficient
-      -- watcher instead of asking nvim to watch the entire monorepo tree
-      capabilities.workspace = capabilities.workspace or {}
-      capabilities.workspace.didChangeWatchedFiles = { dynamicRegistration = false }
-
-      -- Suppress noisy file-watcher warnings from gopls on missing dirs
-      local orig_notify = vim.notify
-      vim.notify = function(msg, level, opts)
-        if type(msg) == "string" and msg:find("watch.watch: ENOENT") then return end
-        orig_notify(msg, level, opts)
-      end
+      vim.lsp.config("*", { capabilities = capabilities })
 
       -- gopls: use native nvim 0.11 API, bypass mason entirely
       vim.lsp.config("gopls", {
@@ -185,36 +238,14 @@ require("lazy").setup({
         -- its own GOROOT, so no GOROOT override is needed.
         cmd_env = {
           PATH = "/opt/homebrew/opt/go/bin:" .. vim.env.PATH,
-          GOWORK = "off",
         },
         capabilities = capabilities,
-        -- Scope the workspace to the service/lib/tool directory instead of the
-        -- monorepo module root (go/), which has ~13k Go files. Together with
-        -- expandWorkspaceToModule=false this keeps gopls from indexing every
-        -- service. Trade-off: find-references/rename only see the scoped dir
-        -- plus its dependencies, not other services.
-        root_dir = function(bufnr, on_dir)
-          local fname = vim.api.nvim_buf_get_name(bufnr)
-          local mod_root = vim.fs.root(fname, { "go.mod", "go.work" })
-          if not mod_root then return end
-          local rel = fname:sub(#mod_root + 2)
-          local kind, name = rel:match("^([^/]+)/([^/]+)/")
-          if kind == "services" or kind == "lib" or kind == "tools" then
-            on_dir(vim.fs.joinpath(mod_root, kind, name))
-          else
-            on_dir(mod_root)
-          end
-        end,
         settings = {
           gopls = {
             gofumpt = true,
-            symbolMatcher = "FastFuzzy",
             semanticTokens = false,
             usePlaceholders = true,
-            staticcheck = false,
-            expandWorkspaceToModule = false,
             linksInHover = false,
-            diagnosticsTrigger = "Save",
             codelenses = {
               gc_details = false,
               generate = false,
@@ -225,63 +256,35 @@ require("lazy").setup({
               vendor = false,
               test = false,
             },
-            directoryFilters = {
-              "-vendor", "-gen", "-third_party",
-              "-node_modules", "-bazel-bin", "-bazel-out", "-bazel-testlogs",
-            },
-            analyses = {
-              unusedparams = true,
-              nilness = true,
-              unusedwrite = true,
-              unreachable = true,
-              nonewvars = true,
-            },
           },
         },
       })
       vim.lsp.enable("gopls")
 
       -- Other LSP servers via mason-lspconfig
+      vim.lsp.config("ts_ls", {
+        root_markers = { "tsconfig.json", "package.json" },
+      })
+      vim.lsp.config("pyright", {
+        root_markers = { "pyrightconfig.json", "pyproject.toml", "setup.py" },
+      })
+      vim.lsp.config("lua_ls", {
+        settings = {
+          Lua = {
+            diagnostics = { globals = { "vim" } },
+            workspace = { checkThirdParty = false },
+            telemetry = { enable = false },
+          },
+        },
+      })
       require("mason-lspconfig").setup({
         ensure_installed = {
           "lua_ls",
           "pyright",
           "ts_ls",
+          "intelephense",
         },
-        handlers = {
-          function(server_name)
-            vim.lsp.config(server_name, { capabilities = capabilities })
-            vim.lsp.enable(server_name)
-          end,
-          ["gopls"] = function() end,
-          ["ts_ls"] = function()
-            vim.lsp.config("ts_ls", {
-              capabilities = capabilities,
-              root_markers = { "tsconfig.json", "package.json" },
-            })
-            vim.lsp.enable("ts_ls")
-          end,
-          ["pyright"] = function()
-            vim.lsp.config("pyright", {
-              capabilities = capabilities,
-              root_markers = { "pyrightconfig.json", "pyproject.toml", "setup.py" },
-            })
-            vim.lsp.enable("pyright")
-          end,
-          ["lua_ls"] = function()
-            vim.lsp.config("lua_ls", {
-              capabilities = capabilities,
-              settings = {
-                Lua = {
-                  diagnostics = { globals = { "vim" } },
-                  workspace = { checkThirdParty = false },
-                  telemetry = { enable = false },
-                },
-              },
-            })
-            vim.lsp.enable("lua_ls")
-          end,
-        },
+        automatic_enable = { exclude = { "gopls" } },
       })
 
       -- Completion setup
@@ -472,6 +475,35 @@ require("lazy").setup({
   {
     "j-hui/fidget.nvim",
     opts = {},
+  },
+
+  {
+    "sindrets/diffview.nvim",
+    commit = "4516612fe98ff56ae0415a259ff6361a89419b0a",
+    cmd = {
+      "DiffviewOpen", "DiffviewClose", "DiffviewFileHistory",
+      "DiffviewToggleFiles", "DiffviewFocusFiles", "DiffviewRefresh",
+    },
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    keys = {
+      { "<leader>gd", "<cmd>DiffviewOpen<cr>", desc = "Review Changes" },
+      { "<leader>gD", open_base_diff, desc = "Review Against Base Branch" },
+      { "<leader>gq", "<cmd>DiffviewClose<cr>", desc = "Close Review" },
+      { "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", desc = "File History" },
+      { "<leader>gf", "<cmd>DiffviewFocusFiles<cr>", desc = "Focus Review Files" },
+    },
+    opts = {
+      default_args = {
+        DiffviewOpen = { "--imply-local" },
+      },
+      keymaps = {
+        view = {
+          ["<leader>e"] = false,
+          { "n", "]c", "]c", { desc = "Next Diff Hunk" } },
+          { "n", "[c", "[c", { desc = "Previous Diff Hunk" } },
+        },
+      },
+    },
   },
 
   -- Git signs in the gutter
