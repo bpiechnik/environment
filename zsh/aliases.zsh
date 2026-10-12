@@ -30,15 +30,3 @@ alias tmsk='~/.local/scripts/tmux-sessionizer-clean'
 # --- kubernetes ---
 alias k='kubectl'
 alias kctx='kubectx'
-
-# --- containers ---
-alias pcd='podman-compose down'
-alias pcdv='podman-compose down -v'
-
-# --- localstack sqs ---
-alias slist="awslocal sqs list-queues"
-alias qurl='awslocal sqs list-queues | jq -r '\''.QueueUrls[1]'\'' | pbcopy'
-
-deleteq() {
-    awslocal sqs delete-queue --queue-url "$(awslocal sqs list-queues | jq -r '.QueueUrls[0]')"
-}

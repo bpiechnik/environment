@@ -24,7 +24,7 @@ brew "git"                  # newer than macOS /usr/bin/git
 brew "ripgrep"
 brew "fd"
 brew "bat"                  # `df` alias
-brew "jq"                   # sqs aliases
+brew "jq"
 brew "yq"
 brew "tree"
 brew "wget"
@@ -83,12 +83,8 @@ brew "kubectx"              # kubectx + kubens
 
 # --- containers / data ---
 brew "colima"
-brew "podman"
 brew "docker"
 brew "docker-compose"
-brew "podman-compose"       # pcd / pcdv aliases
-brew "awscli-local"         # awslocal: slist / qurl / deleteq aliases
-brew "postgresql@18"
 brew "valkey"
 
 # --- casks ---
